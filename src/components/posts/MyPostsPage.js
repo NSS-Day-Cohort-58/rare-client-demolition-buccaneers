@@ -1,49 +1,53 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect, navigate } from "react";
+import { useParams } from "react-router-dom";
 import { deletePost } from "../../managers/PostManager";
+import "./Posts.css";
+
 export const MyPostPage = () => {
-  const [posts, setPosts] = useState([]);
+  const { postId } = useParams();
+  const [post, updatePost] = useState();
 
   useEffect(() => {
-    fetch(`http://localhost:8088/posts`)
+    fetch(`http://localhost:8088/posts/${postId}`)
       .then((response) => response.json())
-      .then((postArray) => {
-        setPosts(postArray);
+      .then((data) => {
+        updatePost(data);
       });
   }, []);
-
   return (
-    <table className="minimalistBlack">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Date</th>
-          <th>Category</th>
-          <th>Tags</th>
-        </tr>
-      </thead>
-      {posts.map((post) => (
-        <tbody key={post.id}>
-          <tr>
-            <td>{post.title}</td>
-            <td>
-              {post.user.first_name} {post.user.last_name}
-            </td>
-            <td>{post.publication_date}</td>
-            <td>{post.category.label}</td>
-            <td>{post.tags}</td>
-          </tr>
-        </tbody>
-      ))}
-
-      {/* used to delete the content of the post.
-    need to find a way to bring in a delete function
-    need to find a way to import the delete function
-    from server side and migrate it to the client side  */}
+    <section className="post">
+      <header className="post__header">
+        <h1>{post?.title}</h1>
+      </header>
+      <div className="post_category">
+        <h2>{post?.category?.label}</h2>
+      </div>
+      <div className="image">
+        {" "}
+        <img src={post?.image_url} alt="" width="160" height="90" />{" "}
+      </div>
+      <div>
+        <div className="post_author">
+          <h1>
+            By: {post?.user?.first_name} {post?.user?.last_name}{" "}
+          </h1>{" "}
+        </div>
+        <button className="post_button">Comments</button>
+      </div>
+      <div>{post?.user?.bio} </div>
+      <footer className="post__footer"></footer>
       <button
-        onClick={() => deletePost(posts.id).then(() => navigate("/posts"))}
+        onClick={() => deletePost(post.id).then(() => navigate("/posts"))}
       >
         Delete Post
       </button>
-    </table>
+      ;
+    </section>
   );
 };
+{
+  /* used to delete the content of the post.
+    need to find a way to bring in a delete function
+    need to find a way to import the delete function
+    from server side and migrate it to the client side  */
+}
